@@ -11,9 +11,9 @@ from pptx.oxml.ns import qn
 from lxml import etree
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BG = os.path.join(ROOT, "ОВЧ-ЭКЗ", "Результат", "pres_bg")
-IMG = os.path.join(ROOT, "ОВЧ-ЭКЗ", "Результат", "images")
-OUT = os.path.join(ROOT, "ОВЧ-ЭКЗ", "Результат", "3952_Теддер_Д_ОхлаждениеКомпьютерныхСистем_Презентация.pptx")
+BG = os.path.join("/tmp", "pres_bg")  # черновые фоны вне репозитория
+IMG = os.path.join(ROOT, "ОВЧ-ЭКЗ", "Итоговые работы", "images")
+OUT = os.path.join(ROOT, "ОВЧ-ЭКЗ", "Итоговые работы", "3952_Теддер_Д_ОхлаждениеКомпьютерныхСистем_Презентация.pptx")
 os.makedirs(BG, exist_ok=True)
 
 W, H = 1920, 1080

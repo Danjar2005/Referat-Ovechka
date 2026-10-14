@@ -15,8 +15,8 @@ from referat_content_2 import BLOCKS_2
 from referat_content_3 import BLOCKS_3
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-IMG = os.path.join(ROOT, "ОВЧ-ЭКЗ", "Результат", "images")
-OUT = os.path.join(ROOT, "ОВЧ-ЭКЗ", "Результат", "3952_Теддер_Д_ОхлаждениеКомпьютерныхСистем_Реферат.docx")
+IMG = os.path.join(ROOT, "ОВЧ-ЭКЗ", "Итоговые работы", "images")
+OUT = os.path.join(ROOT, "ОВЧ-ЭКЗ", "Итоговые работы", "3952_Теддер_Д_ОхлаждениеКомпьютерныхСистем_Реферат.docx")
 
 BLOCKS = BLOCKS_1 + BLOCKS_2 + BLOCKS_3
 
