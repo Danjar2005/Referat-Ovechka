@@ -355,35 +355,34 @@ for i, sd in enumerate(SLIDES, start=1):
     else:
         t = add_text(slide, 0.62, 0.62, 11.6, 0.9,
                      [{"t": sd["title"], "size": 30, "bold": True, "color": "EAFBFF", "font": "Consolas"}])
-        ids.append(t.shape_id)
+        auto_ids = [t.shape_id]
+        click_ids = []
         y = 1.62
         has_table = "table" in sd
         has_img = sd.get("img")
         text_w = 7.35 if (has_img or has_table) else 11.9
         if has_table:
             tb = add_table(slide, sd["table"], 0.65, y + 0.1, 7.2)
-            ids.append(tb.shape_id)
+            auto_ids.append(tb.shape_id)
             y += 0.42 * (len(sd["table"]["rows"]) + 1) + 0.35
         for b in sd["bullets"]:
             size = 16 if len(b) < 78 else 14
             bb = add_text(slide, 0.72, y, text_w - 0.1, 0.6,
                           [{"runs": [{"t": "> ", "size": size, "color": "00E5FF", "font": "Consolas", "bold": True},
                                      {"t": b, "size": size, "color": "D9ECF8", "font": "Segoe UI"}]}], spacing=1.0)
-            ids.append(bb.shape_id)
+            click_ids.append(bb.shape_id)
             y += 0.62 if len(b) < 78 else 0.72
         if has_img:
-            p = os.path.join(IMG, sd["img"])
+            pth = os.path.join(IMG, sd["img"])
             from PIL import Image as PILImage
-            iw, ih = PILImage.open(p).size
+            iw, ih = PILImage.open(pth).size
             max_w, max_h = 4.5, 4.6
-            scale = min(max_w / (iw / 96), max_h / (ih / 96), 1)
             w_in = min(max_w, (iw / ih) * max_h)
             h_in = w_in * ih / iw
-            pic = slide.shapes.add_picture(p, Inches(12.75 - w_in), Inches(3.55 - h_in / 2 + 0.6), width=Inches(w_in))
-            ids.append(pic.shape_id)
+            pic = slide.shapes.add_picture(pth, Inches(12.75 - w_in), Inches(3.55 - h_in / 2 + 0.6), width=Inches(w_in))
+            auto_ids.append(pic.shape_id)
+        specs = [(x, "auto") for x in auto_ids] + [(x, "click") for x in click_ids]
     set_transition(slide, ["push", "fade", "cover"][i % 3], i)
-    if sd["kind"] != "title":
-        specs = [(ids[0], "auto")] + [(x, "click") for x in ids[1:]]
     add_timing(slide, specs)
 
 prs.core_properties.title = "Анализ технологий охлаждения компьютерных систем"
