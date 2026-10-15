@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Улучшенная презентация в техногенном стиле:
-- Дополнительные иллюстрации из папки images (heatpipe.png, custom.jpg, peltier.jpg, hwinfo.jpg, fans.jpg)
-- Улучшенный и расширенный текст с фактурой из реферата (термопасты MX-4 / Kryonaut, гидродинамические подшипники FDB, формула Фурье и тепловое сопротивление, тепловой баланс)
-- Разнообразные продвинутые анимации:
-  * плавное выцветание (fade)
-  * вылет слева / справа / снизу (fly: left, right, bottom)
-  * появление с полосами/шторкой (wipe: left, right, down)
-  * масштабирование/увеличение (zoom)
-  * эффекты колеса и жалюзи (wheel, blinds)
-  * каскадные временные задержки (последовательное появление с задержками)
-  * интерактивные переходы по клику для пунктов доклада
-- Динамичные переходы между слайдами (push, cover, fade)
-- Неоновые техно-рамки вокруг фотографий и графиков
+Улучшенная презентация в техногенном стиле (Версия 2):
+- Раздел сравнения с прямым ответом на вопрос «Какой способ охлаждения всё-таки лучше?»:
+  * Сравнительная таблица слева
+  * Выделенный интерактивный блок с вердиктом и сценариями выбора справа
+- Продвинутые сложные анимации (Fly, Wipe, Zoom, Fade, Blinds) с каскадными таймингами
+- Богатый фактаж из реферата (TDP, R_th, формулы, термопасты, нормы ГОСТ и охраны труда)
+- Иллюстрации из папки images
 """
 import math, os, random
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -25,14 +19,15 @@ from pptx.oxml.ns import qn
 from lxml import etree
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# если скрипт в /tmp:
 if not os.path.exists(os.path.join(ROOT, "ОВЧ-ЭКЗ")):
     ROOT = "/home/user/Referat-Ovechka"
 
-BG = os.path.join("/tmp", "pres_bg_upgraded")
+BG = os.path.join("/tmp", "pres_bg_upgraded2")
 IMG = os.path.join(ROOT, "ОВЧ-ЭКЗ", "Итоговые работы", "images")
 OUT = os.path.join(ROOT, "ОВЧ-ЭКЗ", "Итоговые работы", "3952_Теддер_Д_ОхлаждениеКомпьютерныхСистем_Презентация.pptx")
+OUT2 = os.path.join(ROOT, "ОВЧ-ЭКЗ", "Итоговые работы2", "3952_Теддер_Д_ОхлаждениеКомпьютерныхСистем_Презентация2.pptx")
 os.makedirs(BG, exist_ok=True)
+os.makedirs(os.path.dirname(OUT2), exist_ok=True)
 
 W, H = 1920, 1080
 CYAN = (0, 229, 255)
@@ -185,19 +180,27 @@ SLIDES = [
          img_anim="zoom"),
 
     dict(tag="07 // СРАВНЕНИЕ", accent=CYAN, kind="content",
-         title="Сравнительный анализ технологий охлаждения",
+         title="Сравнительный анализ: какой способ охлаждения лучше?",
          table=dict(
-             headers=["Технология", "Предел отвода", "Шум", "Сложность ТО", "Риск аварии"],
-             rows=[["Башенный кулер", "до 250 Вт", "средний", "низкая", "минимальный"],
-                   ["Моноблок AIO", "250–350 Вт", "низкий-средний", "низкая", "низкий"],
-                   ["Кастомная СЖО", "600+ Вт", "низкий", "высокая", "средний (протечка)"],
-                   ["Модуль Пельтье", "до 150 Вт", "высокий", "средняя", "конденсат на плате"],
-                   ["Иммерсионное", "без лимита узла", "минимальный", "средняя", "минимальный"],
-                   ["Пассивное", "30–60 Вт", "бесшумно", "минимальная", "нет"]]),
-         bullets=["Выбор технологии определяется балансом мощности TDP, габаритов шасси, бюджета и требований к шуму"],
+             headers=["Технология", "Предел TDP", "Шум", "Сложность ТО", "Надёжность"],
+             rows=[["Башенный кулер", "до 250 Вт", "средний", "минимальная", "максимальная"],
+                   ["Моноблок AIO", "250–350 Вт", "низкий", "низкая", "высокая (3–5 лет)"],
+                   ["Кастомная СЖО", "600+ Вт", "минимальный", "очень высокая", "требует ТО"],
+                   ["Модуль Пельтье", "до 150 Вт", "высокий", "средняя", "риск конденсата"],
+                   ["Иммерсионное", "не ограничен", "минимальный", "средняя", "высокая (ЦОД)"],
+                   ["Пассивное", "30–60 Вт", "бесшумно", "минимальная", "абсолютная"]]),
+         side_panel=dict(
+             title="ВЕРДИКТ: ЧТО ЖЕ ВСЁ-ТАКИ ЛУЧШЕ?",
+             items=[
+                 {"tag": "★ АБСОЛЮТНЫЙ ЛИДЕР ДЛЯ 90% ПК:", "text": "Воздушный башенный кулер (6–8 трубок). Лучшее соотношение цена/надёжность/эффективность: не может протечь, служит 10+ лет."},
+                 {"tag": "★ ЛУЧШИЙ ВЫБОР ДЛЯ ГОРЯЧИХ ЦП (>250 Вт):", "text": "Моноблочная СЖО (AIO 280/360 мм). Идеальна для компактных корпусов и тяжёлого рендеринга без шума."},
+                 {"tag": "★ ЭТАЛОН ДЛЯ ЭНТУЗИАСТОВ (ЦП + ГП):", "text": "Кастомный контур. Отводит свыше 600 Вт в абсолютной тишине, но требует регулярного ТО."},
+                 {"tag": "★ ПРОРЫВ ДЛЯ СЕРВЕРОВ И ЦОД:", "text": "Иммерсионные ванны. Достигают PUE = 1,09 и рекордной плотности вычислений."}
+             ]
+         ),
+         bullets=["Итог: единого идеала нет, но для ПК стандарт надёжности — воздух, а для пиковых нагрузок — СЖО"],
          img=None,
-         title_anim="fly_left",
-         bullet_anim="fade"),
+         title_anim="fly_left"),
 
     dict(tag="08 // ДЕГРАДАЦИЯ", accent=AMBER, kind="content",
          title="Факторы деградации систем охлаждения со временем",
@@ -333,7 +336,7 @@ def add_table(slide, spec, x, y, w):
     cols = len(spec["headers"])
     gf = slide.shapes.add_table(rows, cols, Inches(x), Inches(y), Inches(w), Inches(0.38 * rows))
     tbl = gf.table
-    first = w * (0.32 if cols == 4 else (0.28 if cols == 5 else 0.35))
+    first = w * (0.30 if cols == 5 else (0.28 if cols == 4 else 0.35))
     rest = (w - first) / (cols - 1)
     for ci, col in enumerate(tbl.columns):
         col.width = Inches(first if ci == 0 else rest)
@@ -342,7 +345,7 @@ def add_table(slide, spec, x, y, w):
         cell.text = htext
         cell.fill.solid(); cell.fill.fore_color.rgb = RGBColor.from_string("0E2A3A")
         p = cell.text_frame.paragraphs[0]
-        p.font.name = "Consolas"; p.font.size = Pt(14); p.font.bold = True
+        p.font.name = "Consolas"; p.font.size = Pt(13); p.font.bold = True
         p.font.color.rgb = RGBColor.from_string("00E5FF")
     for r, row in enumerate(spec["rows"], start=1):
         for c, val in enumerate(row):
@@ -351,7 +354,7 @@ def add_table(slide, spec, x, y, w):
             cell.fill.solid()
             cell.fill.fore_color.rgb = RGBColor.from_string("0A1622" if r % 2 else "0D1B2A")
             p = cell.text_frame.paragraphs[0]
-            p.font.name = "Consolas"; p.font.size = Pt(12)
+            p.font.name = "Consolas"; p.font.size = Pt(11.5)
             p.font.color.rgb = RGBColor.from_string("D7E9F5")
     return gf
 
@@ -369,15 +372,6 @@ def set_transition(slide, kind):
         etree.SubElement(trans, qn("p:fade"))
 
 def build_advanced_anim(slide, anim_specs):
-    """
-    Полноценный построитель сложных OOXML-анимаций.
-    anim_specs: список словарей:
-      spid: id шейпа
-      trig: 'auto' (автоматически при показе) или 'click' (по клику мыши)
-      effect: 'fade', 'fly_left', 'fly_right', 'fly_bottom', 'wipe_left', 'wipe_right', 'zoom', 'blinds', 'wheel'
-      dur: длительность в мс (по умолчанию 450-500)
-      delay: задержка в мс от начала группы (для каскада)
-    """
     sld = slide._element
     timing = etree.SubElement(sld, qn("p:timing"))
     tnlst = etree.SubElement(timing, qn("p:tnLst"))
@@ -526,7 +520,6 @@ def build_advanced_anim(slide, anim_specs):
     nxt = etree.SubElement(seq, qn("p:nextCondLst"))
     c = etree.SubElement(nxt, qn("p:cond")); c.set("delay", "0"); c.set("evt", "onNext")
 
-# Генерация слайдов
 TRANSITIONS = ["push", "cover", "fade", "wipe"]
 
 for i, sd in enumerate(SLIDES, start=1):
@@ -564,7 +557,6 @@ for i, sd in enumerate(SLIDES, start=1):
         for b_idx, b in enumerate(sd["bullets"]):
             bb = add_text(slide, 1.4, y, 10.53, step,
                           [{"t": b, "size": bsize, "color": "B9D4E6", "font": "Segoe UI"}], align=PP_ALIGN.CENTER)
-            # в титульном слайде интро появляется авто каскадом, а в заключении по клику
             if sd.get("sub"):
                 anim_specs.append({"spid": bb.shape_id, "trig": "auto", "effect": b_effect, "dur": 400, "delay": 400 + b_idx * 250})
             else:
@@ -582,39 +574,79 @@ for i, sd in enumerate(SLIDES, start=1):
         anim_specs.append({"spid": t.shape_id, "trig": "auto", "effect": t_effect, "dur": 450, "delay": 0})
 
         has_table = "table" in sd
+        has_side_panel = "side_panel" in sd
         has_img = sd.get("img")
-        text_w = 7.35 if (has_img or has_table) else 11.9
-        y = 1.58
 
-        if has_table:
-            tb = add_table(slide, sd["table"], 0.65, y + 0.05, 7.2)
+        if has_side_panel:
+            # Слайд сравнения: таблица слева, блок вердикта справа
+            y = 1.58
+            tb = add_table(slide, sd["table"], 0.65, y + 0.05, 7.3)
             anim_specs.append({"spid": tb.shape_id, "trig": "auto", "effect": "wipe_right", "dur": 500, "delay": 150})
-            y += 0.40 * (len(sd["table"]["rows"]) + 1) + 0.30
 
-        for b in sd["bullets"]:
-            size = 15 if len(b) < 80 else 13.5
-            bb = add_text(slide, 0.72, y, text_w - 0.1, 0.58,
-                          [{"runs": [{"t": "> ", "size": size, "color": "00E5FF", "font": "Consolas", "bold": True},
-                                     {"t": b, "size": size, "color": "D9ECF8", "font": "Segoe UI"}]}], spacing=1.0)
-            anim_specs.append({"spid": bb.shape_id, "trig": "click", "effect": b_effect, "dur": 400})
-            y += 0.58 if len(b) < 80 else 0.68
+            # Правый блок: заголовок вердикта + 4 карточки
+            sp_data = sd["side_panel"]
+            sp_hdr = add_text(slide, 8.20, y + 0.05, 4.50, 0.45,
+                              [{"t": sp_data["title"], "size": 15, "bold": True, "color": "00E5FF", "font": "Consolas"}])
+            anim_specs.append({"spid": sp_hdr.shape_id, "trig": "auto", "effect": "fade", "dur": 450, "delay": 250})
 
-        if has_img:
-            pth = os.path.join(IMG, sd["img"])
-            from PIL import Image as PILImage
-            iw, ih = PILImage.open(pth).size
-            max_w, max_h = 4.6, 4.8
-            w_in = min(max_w, (iw / ih) * max_h)
-            h_in = w_in * ih / iw
-            pic_x = Inches(12.75 - w_in)
-            pic_y = Inches(3.7 - h_in / 2 + 0.4)
-            pic = slide.shapes.add_picture(pth, pic_x, pic_y, width=Inches(w_in))
-            anim_specs.append({"spid": pic.shape_id, "trig": "auto", "effect": img_effect, "dur": 550, "delay": 200})
+            py = y + 0.52
+            for itm in sp_data["items"]:
+                card_runs = [
+                    {"runs": [{"t": itm["tag"] + "\n", "size": 12.5, "bold": True, "color": "9AFF3D", "font": "Consolas"},
+                              {"t": itm["text"], "size": 12, "color": "E2F1FB", "font": "Segoe UI"}]}
+                ]
+                card = add_text(slide, 8.20, py, 4.50, 1.05, card_runs, spacing=1.0)
+                anim_specs.append({"spid": card.shape_id, "trig": "click", "effect": "fly_right", "dur": 400})
+                py += 1.10
+
+            # Итоговый вывод внизу под таблицей
+            by = y + 0.40 * (len(sd["table"]["rows"]) + 1) + 0.35
+            for b in sd["bullets"]:
+                bb = add_text(slide, 0.72, by, 7.2, 0.65,
+                              [{"runs": [{"t": "⚡ ИТОГ: ", "size": 13.5, "color": "FFB020", "font": "Consolas", "bold": True},
+                                         {"t": b, "size": 13.5, "color": "D9ECF8", "font": "Segoe UI"}]}], spacing=1.0)
+                anim_specs.append({"spid": bb.shape_id, "trig": "click", "effect": "wipe_right", "dur": 400})
+                by += 0.65
+
+        else:
+            text_w = 7.35 if (has_img or has_table) else 11.9
+            y = 1.58
+
+            if has_table:
+                tb = add_table(slide, sd["table"], 0.65, y + 0.05, 7.2)
+                anim_specs.append({"spid": tb.shape_id, "trig": "auto", "effect": "wipe_right", "dur": 500, "delay": 150})
+                y += 0.40 * (len(sd["table"]["rows"]) + 1) + 0.30
+
+            for b in sd["bullets"]:
+                size = 15 if len(b) < 80 else 13.5
+                bb = add_text(slide, 0.72, y, text_w - 0.1, 0.58,
+                              [{"runs": [{"t": "> ", "size": size, "color": "00E5FF", "font": "Consolas", "bold": True},
+                                         {"t": b, "size": size, "color": "D9ECF8", "font": "Segoe UI"}]}], spacing=1.0)
+                anim_specs.append({"spid": bb.shape_id, "trig": "click", "effect": b_effect, "dur": 400})
+                y += 0.58 if len(b) < 80 else 0.68
+
+            if has_img:
+                pth = os.path.join(IMG, sd["img"])
+                from PIL import Image as PILImage
+                iw, ih = PILImage.open(pth).size
+                max_w, max_h = 4.6, 4.8
+                w_in = min(max_w, (iw / ih) * max_h)
+                h_in = w_in * ih / iw
+                pic_x = Inches(12.75 - w_in)
+                pic_y = Inches(3.7 - h_in / 2 + 0.4)
+                pic = slide.shapes.add_picture(pth, pic_x, pic_y, width=Inches(w_in))
+                anim_specs.append({"spid": pic.shape_id, "trig": "auto", "effect": img_effect, "dur": 550, "delay": 200})
 
     set_transition(slide, TRANSITIONS[(i - 1) % len(TRANSITIONS)])
     build_advanced_anim(slide, anim_specs)
 
 prs.core_properties.title = "Анализ технологий охлаждения компьютерных систем"
 prs.core_properties.author = "Теддер Даниил"
+
+# Сохраняем в оба пути
 prs.save(OUT)
-print("Успешно сохранено:", OUT, "слайдов:", TOTAL)
+prs.save(OUT2)
+print("Успешно сохранено:")
+print(" 1)", OUT)
+print(" 2)", OUT2)
+print("Слайдов:", TOTAL)
